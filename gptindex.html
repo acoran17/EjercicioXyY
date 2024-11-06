@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Ejercicio X y Y</h1>
+  <p>El numero de Xs es <span id="xs">--</span> y el numero de Os es <span id="os">--</span></p>
+  <table></table>
+  <script>
+    let filas = parseInt(prompt("Ingrese un numero de filas: "));
+    let columnas = parseInt(prompt("Ingrese un numero de columnas: "));
+
+    if (filas !== null && columnas !== null) {
+      console.log('Estoy dentro');
+      let spanXs = document.querySelector('#xs');
+      let spanOs = document.querySelector('#os');
+      const table = document.querySelector('table');
+
+      for (let i = 0; i < filas; i++) {
+        let tr = document.createElement('tr');
+        for (let y = 0; y < columnas; y++) {
+          let td = document.createElement('td');
+          td.textContent = Math.random() < 0.5 ? "X" : "O";
+          td.setAttribute('onclick', 'change(this)')
+          tr.append(td);
+          checkRow(tr);
+        }
+        table.append(tr);
+      }
+
+      checkAllColumns();
+      count();
+
+      function change(td) {
+        if (td.textContent == "X") {
+          td.textContent = "O";
+        } else {
+          td.textContent = "X";
+        }
+
+        checkRow(td.parentElement);
+        checkAllColumns();
+        count();
+      }
+
+      function count() {
+        let tds = document.querySelectorAll('td');
+        let xs = [...tds].filter(td => td.textContent == 'X').length;
+        spanXs.textContent = xs;
+        spanOs.textContent = tds.length - xs;
+      }
+
+      function checkRow(row) {
+        let symbol = row.children[0].textContent;
+        if ([...row.children].every(td => td.textContent == symbol)) {
+          console.log("Filas Iguales");
+          row.remove();
+          checkAllColumns();
+        }
+      }
+
+      function checkColumns(idColumn, rowsDelete) {
+        let cells = document.querySelectorAll(`td:nth-child(${idColumn + 1})`);
+        console.log(cells);
+        let symbol = cells[0].textContent;
+        if ([...cells].every(td => td.textContent == symbol)) {
+          console.log("Columnas Iguales");
+          cells.forEach(td => rowsDelete.push(td));
+        }
+      }
+
+      function checkAllColumns() {
+        console.log('checkeo la columna');
+        if (table.children.length === 0) {
+            console.log('No hay filas en la tabla');
+            return;  // Si no hay filas, no hacer nada
+        }
+        let nColums = table.children[0].children.length;
+        let rowsDelete = [];
+        for (let i = 0; i < nColums; i++) {
+          checkColumns(i, rowsDelete);
+        }
+        let anyToDelete = rowsDelete.length;
+        rowsDelete.reverse().forEach(td => td.remove()); // Eliminar en reversa
+        if (anyToDelete) {
+          [...table.children].forEach(tr => checkRow(tr));
+        }
+      }
+    }
+  </script>
+</body>
+</html>

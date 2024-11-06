@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <h1>Ejercicio X y Y</h1>
+  <p>El numero de Xs es <span id="xs">--</span> y el numero de Os es <span id="os">--</span></p>
+  <table></table>
+  <script>
+    const filas = 5;
+    const columnas = 5;
+    const spanXs = document.querySelector('#xs');
+    const spanOs = document.querySelector('#os');
+    const table = document.querySelector('table');
+
+    for (let i = 0; i < filas; i++) {
+      let tr = document.createElement('tr');
+      for (let y = 0; y < columnas; y++) {
+        let td = document.createElement('td');
+        td.textContent = Math.random() < 0.5 ? "X" : "O";
+        td.setAttribute('onclick', 'change(this)')
+        tr.append(td);
+      }
+      table.append(tr);
+      checkRow(tr);
+    }
+
+    checkAllColumns();
+    
+    function change(td) {
+      if(td.textContent == "X") {
+        td.textContent = "O";
+      }else {
+        td.textContent = "X"
+      }
+
+      checkRow(td.parentElement);
+      checkAllColumns()
+      count()
+    }
+
+    function count() {
+      tds = document.querySelectorAll('td');
+      let xs = [...tds].filter(td => td.textContent == 'X').length;
+      spanXs.textContent = xs;
+      //spanO.textContent = (nRows * nColums) - xs;
+      spanOs.textContent = tds.length - xs;
+    }
+
+    count();
+
+    function checkRow(row) {
+      symbol = row.children[0].textContent;
+      if ([...row.children].every(td => td.textContent == symbol)) {
+        console.log("Filas Iguales");
+        row.remove();
+        checkAllColumns()
+      }
+    }
+
+    function checkColumns(idColumn, rowsDelete) {
+      //Cojo todos los tds de la fila que se indique. 
+      //Se le indica como un numero y eso dice que fila es.
+      let cells = document.querySelectorAll(`td:nth-child(${idColumn})`);
+      console.log(cells);
+      
+      //Cojo el simbolo del primer td para compararlo
+      let symbol = cells[0].textContent;
+      if ([...cells].every(td => td.textContent == symbol)) {
+        console.log("Columnas Iguales");
+        //meto en el array rowDelete el td que se eliminaria de cada columna
+        cells.forEach(td => rowsDelete.push(td));
+      }
+    }
+
+    function checkAllColumns() { 
+      console.log('checkeo la columna');
+      //Llamo a la tabla comprobando cuantos tds tiene el primer tr
+      //El hijo de tabla es el tr y el hijo del hijo son los tds
+      let nColums = table.children[0].children.length;
+      rowsDelete = [];
+      for (let i = 1; i < nColums; i++) {
+        //Hago un bucle con el numero de columnas y llamo a la funcion
+        //siendo la i el numero de la columna y metiendo en el array
+        //rowDelete cada determinado td que se vaya a eliminar.
+        checkColumns(i, rowsDelete);
+      } 
+      let anyToDelete = rowsDelete.length;
+      //Elimino todos los tds que se encuentren en el array
+      rowsDelete.forEach(td => td.remove());
+      if (anyToDelete) {
+      //checkeo si se ha borrado alguna columna y si es asi check las filas
+        [...table.children].forEach(tr => checkRow(tr));
+      }
+    }
+  </script>
+</body>
+</html>
